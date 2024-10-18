@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.3'
 
 volumes:
   db_storage:
@@ -14,8 +14,10 @@ services:
       - POSTGRES_DB
       - POSTGRES_NON_ROOT_USER
       - POSTGRES_NON_ROOT_PASSWORD
+      - TZ=Asia/Ho_Chi_Minh
+      - GENERIC_TIMEZONE=Asia/Ho_Chi_Minh
     volumes:
-      - db_storage:/var/lib/postgresql/data
+      - /data/n8n/db:/var/lib/postgresql/data
       - ./init-data.sh:/docker-entrypoint-initdb.d/init-data.sh
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
@@ -33,12 +35,15 @@ services:
       - DB_POSTGRESDB_DATABASE=${POSTGRES_DB}
       - DB_POSTGRESDB_USER=${POSTGRES_NON_ROOT_USER}
       - DB_POSTGRESDB_PASSWORD=${POSTGRES_NON_ROOT_PASSWORD}
+      - N8N_SECURE_COOKIE=false
+      - TZ=Asia/Ho_Chi_Minh
+      - GENERIC_TIMEZONE=Asia/Ho_Chi_Minh
+      - WEBHOOK_URL=https://your.domain.us/
     ports:
       - 5678:5678
     links:
       - postgres
     volumes:
-      - n8n_storage:/home/node/.n8n
+      - /data/n8n/data:/home/node/.n8n
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
